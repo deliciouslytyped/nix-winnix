@@ -4,7 +4,7 @@ Docs pending substance. This is an experimental project / repository. ⚠
 
 Usage: `nix-build shell.nix; ./result/bin/mounter`
 
-We provide no guarantees about any binaries references in the scripts.
+We provide no guarantees about any binaries referenced in the scripts.
 
 Help wanted:
   - a safe way to do the writable overlay mounts without root
