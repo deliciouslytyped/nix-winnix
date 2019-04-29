@@ -1,0 +1,8 @@
+show logging stats on exit
+improved logging
+metadata
+deal with the path hack
+consider as dhall test?
+rootless mount?
+check for un-unmounted mounts until the unmounting code is reliable or something
+add a ton of more assertions because debugging this is shit
