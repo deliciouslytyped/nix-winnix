@@ -1,6 +1,9 @@
 #TODO documentation / talk to upstream
 #  with extensive use of overlay systems like this better infinite recursion debugging is absolutely necessary
 
+#Example attrNames output of this approach (i removed noninteresting stuff):
+#[ ".kkrieger" "UniExtract2" "callPackage" "combinePrefixWithPackages" "config" "cs2d" "explorer++" "extend" "gta2" "gta2-installer" "wine" "winetricks" "withPackages" ]
+
 #TODO documentation
 #TODO im not sure the way i supply callpackages here is correct / sanely overridable? though you should be overriding at the base layer input probably
 #POLICY: no built plugin may use binary files acquired from random repos, they must be built from source or acquired from official sources
@@ -11,7 +14,8 @@ self: super:
     result = 
       let
         dirFilter = (n: v: !(v == "directory"));
-        renamer = name: builtins.head (super.pkgs.lib.splitString "." name);
+        #TODO rething the renamer approach, i already had a bug
+        renamer = name: super.pkgs.lib.removeSuffix ".nix" name;
         importer = value: self.callPackage value {};
       in
         super.lib.pathMapAttrs dirFilter renamer importer ./4_packages;
