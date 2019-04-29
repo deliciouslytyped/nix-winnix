@@ -1,3 +1,4 @@
+#TODO make "run wine op" lib function that always calls wineserver -w
 #TODO not sure if this is the correct way to get winetricks
 {runCommand, wine, xvfb_run, stdenv, winetricks, breakpointHook, bootMode ? "", deskDim ? "1024x768"}:
   stdenv.mkDerivation {

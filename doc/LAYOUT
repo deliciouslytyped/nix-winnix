@@ -1,0 +1,5 @@
+reference scopes
+  lib/packages.nix refers to layers files, layers files are self contained
+    layers/packages.nix refers to packages+1/*.nix
+  lib is otherwise self contained
+  layers refers to lib
