@@ -21,7 +21,7 @@ self: super:
         super.lib.pathMapAttrs dirFilter renamer importer ./4_packages;
   in
     {
-    wine = self.pkgs.winePackages.unstable.overrideAttrs (a: { patches = [ ./4_packages/wine/wine-3.21-patch ]; }); #TODO cant figure out why it wont build in parallel
+    wine = self.pkgs.winePackages.unstable.overrideAttrs (a: { patches = [ ./4_packages/wine/wine-5.12.patch ]; }); #TODO cant figure out why it wont build in parallel
     #TODO NOTE something something this is kind of obscure but we need to match the winetricks wine to wine so need to use self.winetricks not self.pkgs.winetricks for mkPrefix call
     winetricks = self.pkgs.winetricks.override { wine = self.wine; };
       } // result #The order is so that you dont end up scratching your head why your file changes are doing nothing
