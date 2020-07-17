@@ -1,5 +1,5 @@
 #needs to be a runtime eval
-{writeShellScriptBin,
+{writeShellScriptBin, fuse-overlayfs,
 mountprefix, callback, base}:
   writeShellScriptBin "mounter" ''
     set -euo pipefail #http://redsymbol.net/articles/unofficial-bash-strict-mode/
@@ -7,22 +7,22 @@ mountprefix, callback, base}:
     set -x
 
     mount="${mountprefix}"
+    gio trash "$mount" || true
     mkdir -p "$mount" || true #TODO
 
     pushd "$mount"
     #TODO do i actually need all of these?
-    mkdir mutable upper weirdsrc work bind || true #TODO
-    #TODO other FS options? is there any way to not need root?
-    sudo mount -t overlay weirdsrc -o lowerdir="${base}",upperdir=upper,workdir=work mutable #TODO? , metacopy=on /check other opts
-    #these are an adhoc mess figure them out
-    sudo chown -R $USER:100 mutable
-    sudo chmod -R gu+w mutable
-    sudo chmod -R 777 work/work #TODO wat
+    mkdir mutable upper work bind || true #TODO
+
+    cp -r "${base}" lower
+    chmod -R gu+w lower
+    # map root’s uid/gid to user’s and the rest as is
+    ${fuse-overlayfs}/bin/fuse-overlayfs -o uidmapping=0:$(id -u):1:1:1:65536,gidmapping=0:$(id -g):1:1:1:65536,lowerdir=lower,upperdir=upper,workdir=work mutable #TODO? , metacopy=on /check other opts
     popd
 
 
     (${callback}/bin/winerunner) #TODO proper
 
-    sudo umount "$mount"/mutable
+    fusermount -u "$mount"/mutable
     set +x
     ''
