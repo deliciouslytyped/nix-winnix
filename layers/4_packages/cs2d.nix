@@ -8,7 +8,7 @@ let
 
     src = fetchurl {
       name = "cs2d.zip";
-      url = "http://www.unrealsoftware.de/get.php?get=cs2d_1008_win.zip&p=1&cid=1266";
+      url = "https://www.unrealsoftware.de/get.php?get=cs2d_1008_win.zip&p=1&cid=1619";
       sha256 = "1g66635m8zfsxdmg95c1xz72s6pam9w1myrjwk4dnw697dhpir1p";
       };
 

@@ -1,0 +1,80 @@
+commit b105f43f704fce6c0d59554d1c593fcb24f4a739
+Author: Jan Tojnar <jtojnar@gmail.com>
+Date:   Fri Jul 17 08:43:37 2020 +0200
+
+    layers
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index d3145a84e2..c76da04dbc 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1161,9 +1161,6 @@ static int setup_config_dir(void)
+         {
+             while (p > config_dir + 1 && p[-1] == '/') p--;
+             *p = 0;
+-            if (!stat( config_dir, &st ) && st.st_uid != getuid())
+-                fatal_error( "'%s' is not owned by you, refusing to create a configuration directory there\n",
+-                             config_dir );
+             *p = '/';
+         }
+         mkdir( config_dir, 0777 );
+@@ -1172,7 +1169,6 @@ static int setup_config_dir(void)
+     }
+ 
+     if (stat( ".", &st ) == -1) fatal_perror( "stat %s", config_dir );
+-    if (st.st_uid != getuid()) fatal_error( "'%s' is not owned by you\n", config_dir );
+ 
+     server_dir = init_server_dir( st.st_dev, st.st_ino );
+ 
+@@ -1247,8 +1243,6 @@ static int server_connect(void)
+ 
+     /* make sure we are at the right place */
+     if (stat( ".", &st ) == -1) fatal_perror( "stat %s", server_dir );
+-    if (st.st_uid != getuid()) fatal_error( "'%s' is not owned by you\n", server_dir );
+-    if (st.st_mode & 077) fatal_error( "'%s' must not be accessible by other users\n", server_dir );
+ 
+     for (retry = 0; retry < 6; retry++)
+     {
+@@ -1269,8 +1263,6 @@ static int server_connect(void)
+         /* make sure the socket is sane (ISFIFO needed for Solaris) */
+         if (!S_ISSOCK(st.st_mode) && !S_ISFIFO(st.st_mode))
+             fatal_error( "'%s/%s' is not a socket\n", server_dir, SOCKETNAME );
+-        if (st.st_uid != getuid())
+-            fatal_error( "'%s/%s' is not owned by you\n", server_dir, SOCKETNAME );
+ 
+         /* try to connect to it */
+         addr.sun_family = AF_UNIX;
+diff --git a/libs/wine/config.c b/libs/wine/config.c
+index f5b4c0de9a..b462b4a630 100644
+--- a/libs/wine/config.c
++++ b/libs/wine/config.c
+@@ -450,7 +450,6 @@ static void init_paths(void)
+         }
+     }
+     if (!S_ISDIR(st.st_mode)) fatal_error( "%s is not a directory\n", config_dir );
+-    if (st.st_uid != getuid()) fatal_error( "%s is not owned by you\n", config_dir );
+     init_server_dir( st.st_dev, st.st_ino );
+ }
+ 
+diff --git a/server/request.c b/server/request.c
+index 4c1f30a5fe..a181ea40de 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -610,8 +610,6 @@ static void create_dir( const char *name, struct stat *st )
+             fatal_error( "lstat %s: %s\n", name, strerror( errno ));
+     }
+     if (!S_ISDIR(st->st_mode)) fatal_error( "%s is not a directory\n", name );
+-    if (st->st_uid != getuid()) fatal_error( "%s is not owned by you\n", name );
+-    if (st->st_mode & 077) fatal_error( "%s must not be accessible by other users\n", name );
+ }
+ 
+ /* create the server directory and chdir to it */
+@@ -657,8 +655,6 @@ static char *create_server_dir( int force )
+         fatal_error( "open %s: %s\n", config_dir, strerror( errno ));
+     if (fstat( config_dir_fd, &st ) == -1)
+         fatal_error( "stat %s: %s\n", config_dir, strerror( errno ));
+-    if (st.st_uid != getuid())
+-        fatal_error( "%s is not owned by you\n", config_dir );
+ 
+     /* create the base directory if needed */
+ 
